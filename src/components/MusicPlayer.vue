@@ -1,13 +1,13 @@
 <template lang="pug">
 footer.musicPlayer
-    img(src="../assets/img/adele21.jpg").cover
+    img(:src="track.album.cover_medium").cover
     .dataCont
-        span.song Canción
-        span.artistAlbum Artista - Álbum
+        span.song {{ track.title }}
+        span.artistAlbum {{ track.artist.name }} - {{ track.album.title }}
     .mainControls
         i.fas.fa-step-backward.controlIcon
         .circle
-            i.fas.fa-play.controlIcon
+            i.controlIcon(@click="playSong()" class="fa" :class="{ 'fa-play': playIcon, 'fa-pause' : !playIcon}")
         i.fas.fa-step-forward.controlIcon
     .volumeControls
         .controlBar
@@ -17,9 +17,59 @@ footer.musicPlayer
 
 </template>
 <script>
+import { useStore } from 'vuex';
+import { ref, onMounted, watchEffect } from 'vue';
 export default {
     
-}
+    setup(){
+        const store = useStore();
+        onMounted(()=>{
+            selectSong();
+        });
+        
+        //Variables        
+        let song = ref('99976952');
+        let track = ref({
+            title: 'cargando',
+            artist: {
+                name: 'cargando'
+            },
+            album:{
+                name: 'cargando'
+            },
+            preview: 'cargando'
+        });
+        let playing = ref(false);
+        let audio = ref(new Audio());
+        let playIcon = ref(true);
+        watchEffect(() => {let data = store.state.selectedSong;
+        track.value = data });
+        //Methods
+        const selectSong = async () => {
+            const songToSend = song.value;
+            await store.dispatch("selectSong", songToSend);
+        };
+        const playSong = ()=>{
+            if(!playing.value){
+                audio.value = new Audio(track.value.preview);
+                audio.value.play();
+                playIcon.value = false;
+                playing.value = true;
+            } else {
+                audio.value.pause();
+                playIcon.value = true;
+                playing.value = false;
+            }       
+        };
+        return{
+            //Variables
+            track, playIcon,
+
+            //Methods
+            playSong
+        }
+    }
+};
 </script>
 <style scoped lang="sass">
 .musicPlayer
@@ -46,6 +96,7 @@ export default {
             line-height: 17.5px
             margin-bottom: 4px
         .artistAlbum
+            text-align: left
             margin-top: 4px
             padding: 1px
             font-weight: 400
@@ -62,6 +113,7 @@ export default {
             font-size: 18px
             line-height: 20.7px
             color: white
+            cursor: pointer
         .circle
             display: flex
             justify-content: center
@@ -72,7 +124,9 @@ export default {
             border-radius: 100%
             margin-right: .5rem
             margin-left: .5rem
+            cursor: pointer
             .controlIcon
+                cursor: pointer
     .volumeControls
         width: 10%
         display: flex
@@ -80,6 +134,7 @@ export default {
         align-items: center
         padding-right: 1rem
         .controlBar
+            cursor: pointer
             .bar
                 position: relative
                 background: white
@@ -97,6 +152,7 @@ export default {
                     height: 20px
                     border-radius: 100px
                     z-index: 3
+                    cursor: pointer
 
         .volumeIcon
             font-weight: 900

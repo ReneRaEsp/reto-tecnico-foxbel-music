@@ -22,18 +22,18 @@ aside.navBar
 </template>
 <script>
 export default {
-    setup(){
-        //Variables
-        //Methods
-        const hideNavbar = ()=>{
-            let nav = document.getElementById('nav');
-            nav.style.transform = "translateX(-330px)"
-        }
-        return{
-            hideNavbar
-        }
-    }    
-}
+  setup() {
+    //Variables
+    //Methods
+    const hideNavbar = () => {
+      let nav = document.getElementById("nav");
+      nav.style.transform = "translateX(-330px)";
+    };
+    return {
+      hideNavbar,
+    };
+  },
+};
 </script>
 <style scoped lang="sass">
 .navBar
@@ -71,6 +71,7 @@ export default {
         margin-top: 50px
         width: 100%
         height: 59px
+        cursor: pointer
         .logo
             width: 250px
             height: 59px
@@ -98,7 +99,7 @@ export default {
             justify-content: flex-start
             align-items: flex-start
             padding: 0
-            li  
+            li
                 font-weight: normal
                 font-size: 16px
                 line-height: 20px
@@ -109,7 +110,7 @@ export default {
                 display: block
                 list-style: none
                 color: #FFFFFF
-                border-left: 2px solid rgba(255, 255, 255, 0)
+                border-left: 5px solid rgba(255, 255, 255, 0)
                 cursor: pointer
                 transition: .2s
                 &:hover
@@ -121,5 +122,4 @@ export default {
     .navBar
         .hideNavbar
             display: flex
-
 </style>

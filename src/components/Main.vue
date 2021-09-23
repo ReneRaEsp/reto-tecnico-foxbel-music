@@ -10,7 +10,7 @@ main.main
     .albumCont
         .coverCont
             img(:src="artist.picture_big").imageCover
-            i.fas.fa-play.playIcon
+            i.fas.fa-play.playIcon(@click="pickSong(songs[0].id)")
         .descriptionCont
             h2.disco
             .info
@@ -27,29 +27,32 @@ main.main
             .card(v-for="song in songs" :key="song.id")
                 .imageCont
                     img(:src="song.album.cover_medium").imageCover
-                    i.fas.fa-play.playIcon
+                    i.fas.fa-play.playIcon(@click="pickSong(song.id)")
                     .ellipse ...
                 span.titulo {{ song.title }}
                 span.artista {{ song.artist.name }}
             
 </template>
 <script>
+import { useStore } from 'vuex';
 import { ref, onMounted } from "vue";
 import axios from "axios";
 export default {
   setup() {
+      
     onMounted(() => {
-    getSongs();
-    getArtist();
-      console.log('mounted');
+      getSongs();
+      getArtist();
+      console.log("mounted");
     });
     //Variables
+    const store = useStore();
     const songs = ref([]);
     const artist = ref([]);
     //Methods
     const getSongs = async () => {
       await axios
-        .get("http://localhost:5000/api/music/songs")
+        .get("https://compra-ventas-vue-node.herokuapp.com/api/music/songs")
         .then((res) => {
           songs.value = res.data.data;
           console.log(songs.value);
@@ -57,16 +60,25 @@ export default {
         .catch(console.log);
     };
     const getArtist = async () => {
-        await axios
-            .get("http://localhost:5000/api/music/artist")
-            .then((res) => {
-                artist.value = res.data;
-                console.log(artist.value);
-            }).catch(console.log);
+      await axios
+        .get("https://compra-ventas-vue-node.herokuapp.com/api/music/artist")
+        .then((res) => {
+          artist.value = res.data;
+          console.log(artist.value);
+        })
+        .catch(console.log);
     };
-    
+    const pickSong = async (id) => {
+        console.log('pick')
+        await store.dispatch("selectSong", id);
+    };
+
     return {
-      songs, artist
+    //Variables
+      songs,
+      artist,
+    //Methods
+      pickSong
     };
   },
 };
@@ -204,10 +216,20 @@ export default {
                     border-radius: 100px
                 .reproducir
                     background: #E86060
+                    border: 1px solid #EB5757
+                    cursor: pointer
+                    &:hover
+                        color: #EB5757
+                        background: rgba(255, 255, 255, 0)
+                        border: 1px solid #EB5757
                 .seguir
                     margin-left: 1rem
                     border: 1px solid #EB5757
                     color: #EB5757
+                    cursor: pointer
+                    &:hover
+                        background: #E86060
+                        color: white
                 .puntos
                     margin-left: 1rem
     .resultadosSeccion
@@ -253,6 +275,7 @@ export default {
                         color: #FFFFFF
                         z-index: 3
                         position: absolute
+                        cursor: pointer
                     .ellipse
                         font-family: serif
                         position: absolute
