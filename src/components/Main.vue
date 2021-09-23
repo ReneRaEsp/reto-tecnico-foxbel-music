@@ -9,14 +9,14 @@ main.main
             p.userText Francisco M.
     .albumCont
         .coverCont
-            img(src="../assets/img/adele21.jpg").imageCover
+            img(:src="artist.picture_big").imageCover
             i.fas.fa-play.playIcon
         .descriptionCont
-            h2.disco Adele 21
+            h2.disco
             .info
-                p.categoria Lo mejor de Adele 
-                p.seguidores 321.123 seguidores
-            p.descripcion Adele Laurie Blue Adkins (Tottenham, Londres, Inglaterra, 5 de mayo de 1988), conocida simplemente como Adele, es una cantante, compositora y multinstrumentista británica.
+                p.categoria {{ artist.name }}
+                p.seguidores {{ artist.nb_fan }} seguidores
+            p.descripcion Lorem, ipsum dolor sit amet consectetur adipisicing elit. Adipisci praesentium, fugiat laborum ad pariatur cumque, voluptas magni qui esse dicta ex soluta aut. Dicta aliquid consectetur 
             .botonesCont
                 .reproducir.boton Reproducir
                 .seguir.boton Seguir
@@ -24,89 +24,58 @@ main.main
     .resultadosSeccion
         h2.resultados Resultados
         .resultadosCont
-            .card
+            .card(v-for="song in songs" :key="song.id")
                 .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
+                    img(:src="song.album.cover_medium").imageCover
                     i.fas.fa-play.playIcon
                     .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-            .card
-                .imageCont
-                    img(src="../assets/img/adele21.jpg").imageCover
-                    i.fas.fa-play.playIcon
-                    .ellipse ...
-                span.titulo 21
-                span.artista Adele
-        
-
+                span.titulo {{ song.title }}
+                span.artista {{ song.artist.name }}
+            
 </template>
 <script>
+import { ref, onMounted } from "vue";
+import axios from "axios";
 export default {
+  setup() {
+    onMounted(() => {
+    getSongs();
+    getArtist();
+      console.log('mounted');
+    });
+    //Variables
+    const songs = ref([]);
+    const artist = ref([]);
+    //Methods
+    const getSongs = async () => {
+      await axios
+        .get("http://localhost:5000/api/music/songs")
+        .then((res) => {
+          songs.value = res.data.data;
+          console.log(songs.value);
+        })
+        .catch(console.log);
+    };
+    const getArtist = async () => {
+        await axios
+            .get("http://localhost:5000/api/music/artist")
+            .then((res) => {
+                artist.value = res.data;
+                console.log(artist.value);
+            }).catch(console.log);
+    };
     
-}
+    return {
+      songs, artist
+    };
+  },
+};
 </script>
 <style lang="sass">
 .main
     width: 970px
     min-height: 1087px
-    height: auto
+    height: 400px
     background: #E5E5E5
     .busquedaCont
         display: flex
@@ -247,10 +216,9 @@ export default {
         justify-content: flex-start
         align-items: flex-start
         background: rgba(70, 80, 90, 0)
-        width: 100%
-        height: max-content
-        padding-left: 2rem
-        padding-right: 2rem
+        width: 95%
+        height: 740px
+        margin: auto
         .resultados
             margin-top: 4rem
             font-weight: bold
@@ -260,6 +228,7 @@ export default {
             justify-content: flex-start
             align-items: flex-start
             flex-wrap: wrap
+            overflow-y: scroll
             .card
                 display: flex
                 flex-direction: column
@@ -306,7 +275,7 @@ export default {
                     color: #828282
 
 
-                    
+
 
 @media screen and (max-width: 768px)
     .main
