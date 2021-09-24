@@ -91,9 +91,11 @@ export default {
     display: flex
     flex-direction: row
     justify-content: flex-start
+    flex-wrap: wrap
     width: 1300px
     height: 100px
     background: #EB5757
+    z-index: 2
     .cover
         width: 100px
         height: 100px
@@ -180,9 +182,21 @@ export default {
 @media screen and (max-width: 768px)
     .musicPlayer
         display: flex
-        justify-content: flex-start
-        width: 100%
+        justify-content: space-evenly
+        flex-wrap: wrap-reverse
+        width: 100vw
+        height: 70vw
+        padding-bottom: 1rem
         .cover
-            width: 100px
-            height: 100px
+            width: 40vw
+            height: 40vw
+        .dataCont
+            width: 49vw
+            height: 25%
+        .mainControls
+            width: 30vw
+            height: 20vw
+        .volumeControls
+            width: 30vw
+            height: 20vw
 </style>

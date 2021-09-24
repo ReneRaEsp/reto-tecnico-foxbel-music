@@ -44,7 +44,7 @@ main.main(v-else)
             img(:src="artist.picture_big").imageCover
             i.fas.fa-play.playIcon(@click="pickSong(songs[0].id)")
         .descriptionCont
-            h2.disco
+            h2.disco 
             .info
                 p.categoria {{ artist.name }}
                 p.seguidores {{ artist.nb_fan }} seguidores
@@ -287,13 +287,14 @@ export default {
                     cursor: pointer
                     &:hover
                         color: #EB5757
-                        background: rgba(255, 255, 255, 0)
+                        background: #A70000
                         border: 1px solid #EB5757
                 .seguir
                     margin-left: 1rem
                     border: 1px solid #EB5757
                     color: #EB5757
                     cursor: pointer
+                    background: #A70000
                     &:hover
                         background: #E86060
                         color: white
@@ -314,8 +315,8 @@ export default {
         .resultadosCont
             display: flex
             flex-direction: row
-            justify-content: flex-start
-            align-items: flex-start
+            justify-content: center
+            align-items: center
             flex-wrap: wrap
             overflow-y: scroll
             .card
@@ -376,11 +377,24 @@ export default {
                 .buscarInput
                     width: 100%
         .albumCont
+            display: flex
+            flex-wrap: wrap
+            height: auto
             .coverCont
-                width: 35vw
-                height: 35vw
+                width: 75vw
+                height: 75vw
             .descriptionCont
-                width: 65vw
-                height: 35vw
+                width: 100vw
+                height: 40vw
         .resultadosCont
+            height: 60rem
+            z-index: 0
+
+@media screen and (max-width: 468px)
+    .main
+        .albumCont
+            .descriptionCont
+                .descripcion
+                    font-size: 10px
+
 </style>
