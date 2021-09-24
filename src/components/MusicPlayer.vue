@@ -11,9 +11,9 @@ footer.musicPlayer
         i.fas.fa-step-forward.controlIcon
     .volumeControls
         .controlBar
-            .bar
-                .circle
-        i.fas.fa-volume-off.volumeIcon
+            input.bar(@change="selectVolume()" v-model="volumeCh" type="range" min="0" max="1" step="0.01")
+        i(@click="toggleMute()" class="fas volumeIcon" 
+        :class=" { 'fa-volume-up':!isMuted || volumeCh < 0, 'fa-volume-mute': isMuted || volumeCh == 0 }")
 
 </template>
 <script>
@@ -41,7 +41,9 @@ export default {
         });
         let playing = ref(false);
         let audio = ref(new Audio());
+        let volumeCh = ref(1);
         let playIcon = ref(true);
+        let isMuted = ref(false);
         watchEffect(() => {let data = store.state.selectedSong;
         track.value = data });
         //Methods
@@ -52,6 +54,7 @@ export default {
         const playSong = ()=>{
             if(!playing.value){
                 audio.value = new Audio(track.value.preview);
+                audio.value.loop = true;
                 audio.value.play();
                 playIcon.value = false;
                 playing.value = true;
@@ -61,12 +64,24 @@ export default {
                 playing.value = false;
             }       
         };
+        const selectVolume = ()=>{
+            audio.value.volume = volumeCh.value;  
+        };
+        const toggleMute = ()=>{
+            if(isMuted.value){
+                audio.value.volume = volumeCh.value;
+                isMuted.value = false;
+            } else {
+                audio.value.volume = 0;
+                isMuted.value = true;
+            };
+        };
         return{
             //Variables
-            track, playIcon,
+            track, playIcon, volumeCh, isMuted,
 
             //Methods
-            playSong
+            playSong, selectVolume, toggleMute
         }
     }
 };
@@ -134,14 +149,15 @@ export default {
         align-items: center
         padding-right: 1rem
         .controlBar
-            cursor: pointer
             .bar
                 position: relative
                 background: white
+                color: white
                 width: 100px
-                height: 6px
+                height: 16px
                 border-radius: 100px
                 margin-right: 7px
+                cursor: pointer
                 .circle
                     top: 50%
                     left: 50%
@@ -159,6 +175,7 @@ export default {
             font-size: 36px
             line-height: 41.4px
             color: #FFFFFF
+            cursor: pointer
 
 @media screen and (max-width: 768px)
     .musicPlayer
