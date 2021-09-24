@@ -1,9 +1,41 @@
 <template lang="pug">
-main.main
+main.main(v-if="busqueda")
     .busquedaCont
         .barraBusquedaCont
-            input.buscarInput(placeholder="Buscar")
-            i.fas.fa-search.buscarIcon
+            input.buscarInput(placeholder="Buscar" v-model="buscar")
+            i.fas.fa-search.buscarIcon(@keyup.native.enter="searchItem()" @click="searchItem()")
+        .userCont
+            i.fas.fa-user.userIcon
+            p.userText Francisco M.
+    .albumCont
+        .coverCont
+            img(:src="artist.picture_big").imageCover
+            i.fas.fa-play.playIcon(@click="pickSong(items[0].id)")
+        .descriptionCont
+            h2.disco {{ items[0].album.title }}
+            .info
+                p.categoria {{items[0].artist.name}}
+                p.seguidores {{ artist.nb_fan }} seguidores
+            p.descripcion Lorem, ipsum dolor sit amet consectetur adipisicing elit. Adipisci praesentium, fugiat laborum ad pariatur cumque, voluptas magni qui esse dicta ex soluta aut. Dicta aliquid consectetur 
+            .botonesCont
+                .reproducir.boton(@click="see()")  Reproducir
+                .seguir.boton Seguir
+                p.puntos ...
+    .resultadosSeccion
+        h2.resultados Resultados
+        .resultadosCont
+            .card(v-for="item in items" :key="item.id")
+                .imageCont
+                    img(:src="item.album.cover_medium").imageCover
+                    i.fas.fa-play.playIcon(@click="pickSong(item.id)")
+                    .ellipse ...
+                span.titulo {{ item.title }}
+                span.artista {{ item.artist.name }}
+main.main(v-else)
+    .busquedaCont
+        .barraBusquedaCont
+            input.buscarInput(placeholder="Buscar" v-model="buscar")
+            i.fas.fa-search.buscarIcon(@keyup.native.enter="searchItem()" @click="searchItem()")
         .userCont
             i.fas.fa-user.userIcon
             p.userText Francisco M.
@@ -18,7 +50,7 @@ main.main
                 p.seguidores {{ artist.nb_fan }} seguidores
             p.descripcion Lorem, ipsum dolor sit amet consectetur adipisicing elit. Adipisci praesentium, fugiat laborum ad pariatur cumque, voluptas magni qui esse dicta ex soluta aut. Dicta aliquid consectetur 
             .botonesCont
-                .reproducir.boton Reproducir
+                .reproducir.boton(@click="see()") Reproducir
                 .seguir.boton Seguir
                 p.puntos ...
     .resultadosSeccion
@@ -34,12 +66,11 @@ main.main
             
 </template>
 <script>
-import { useStore } from 'vuex';
+import { useStore } from "vuex";
 import { ref, onMounted } from "vue";
 import axios from "axios";
 export default {
   setup() {
-      
     onMounted(() => {
       getSongs();
       getArtist();
@@ -49,36 +80,70 @@ export default {
     const store = useStore();
     const songs = ref([]);
     const artist = ref([]);
+    const items = ref([]);
+    const busqueda = ref(false);
+    const buscar = ref("");
     //Methods
     const getSongs = async () => {
       await axios
-        .get("https://compra-ventas-vue-node.herokuapp.com/api/music/songs")
+        .get(
+          "https://compra-ventas-vue-node.herokuapp.com/api/music/songs?id=647650"
+        )
         .then((res) => {
           songs.value = res.data.data;
           console.log(songs.value);
         })
         .catch(console.log);
     };
-    const getArtist = async () => {
+    const getArtist = async (name = "twenty-one-pilots") => {
       await axios
-        .get("https://compra-ventas-vue-node.herokuapp.com/api/music/artist")
+        .get(
+          "https://compra-ventas-vue-node.herokuapp.com/api/music/artist?name=" +
+            name
+        )
         .then((res) => {
           artist.value = res.data;
           console.log(artist.value);
         })
         .catch(console.log);
     };
+    const searchItem = async () => {
+      let search = buscar.value;
+      search = search.toLowerCase().replace(" ", "-");
+      await axios
+        .get(
+          "https://compra-ventas-vue-node.herokuapp.com/api/music/search?search=" +
+            search
+        )
+        .then((res) => {
+          items.value = res.data.data;
+          console.log("items", items.value);
+        })
+        .catch(console.log);
+      busqueda.value = true;
+      let name = items.value[0].artist.name;
+      name = name.toLowerCase().replace(" ", "-");
+      getArtist(name);
+    };
     const pickSong = async (id) => {
-        console.log('pick')
-        await store.dispatch("selectSong", id);
+      console.log("pick");
+      await store.dispatch("selectSong", id);
+    };
+    const see = () => {
+      console.log(items.value[0].artist.name);
     };
 
     return {
-    //Variables
+      //Variables
       songs,
       artist,
-    //Methods
-      pickSong
+      busqueda,
+      buscar,
+      items,
+      //Methods
+      pickSong,
+      searchItem,
+      see,
     };
   },
 };
@@ -114,7 +179,7 @@ export default {
                 font-weight: 400
                 font-size: 18px
                 line-height: 22.5px
-                color: #BDBDBD
+                color: black
                 &:focus
                     border-radius: 2rem
                     border: 0px solid rgba(255, 255, 255, 0)
@@ -129,6 +194,7 @@ export default {
                 font-size: 18px
                 line-height: 21px
                 color: #BDBDBD
+                cursor: pointer
         .userCont
             display: flex
             flex-direction: column
@@ -175,6 +241,7 @@ export default {
                 font-weight: 900
                 font-size: 72px
                 line-height: 83px
+                cursor: pointer
         .descriptionCont
             width: 642px
             height: 100%
